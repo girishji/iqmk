@@ -1,0 +1,24 @@
+# The purpose of this file is to let cmake download and build qmk during the
+# main project’s configure phase, not build phase (which is what happens if
+# ExternalProject_Add() is placed in the main project's CMakeLists.txt file).
+# https://crascit.com/2015/07/25/cmake-gtest/
+
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+project(qmk-download NONE)
+
+# clone only essential directories
+set(dirs_list /tests/ /quantum/ /tmk_core/ /drivers/ /platforms/ /lib/)
+string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${dirs_list}")
+
+include(ExternalProject)
+ExternalProject_Add(qmk
+    DOWNLOAD_COMMAND @CMAKE_COMMAND@
+        -DGIT_REPO=https://github.com/qmk/qmk_firmware.git
+        -DGIT_TAG=d2892685c52a8a0892b28872cfc43e8f7fa37465
+        -DGIT_SUB_DIRS=${escaped_dirs}
+        -P @PROJECT_SOURCE_DIR@/cmake/git_sparse_clone.cmake
+    PREFIX "@CMAKE_BINARY_DIR@/qmk_firmware"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    )
