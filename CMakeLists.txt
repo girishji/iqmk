@@ -48,8 +48,6 @@ FetchContent_Declare(googletest
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
-
 set(qmk_root ${CMAKE_BINARY_DIR}/qmk_firmware/src)
 
 add_library(qmkcore
@@ -89,14 +87,20 @@ add_library(qmkcore
     ${qmk_root}/tmk_core/protocol/usb_device_state.c
     ${qmk_root}/tmk_core/protocol/usb_util.c
     ${qmk_root}/quantum/keymap_introspection.c
+    ${qmk_root}/tests/test_common/matrix.c
     )
+# XXX matrix.c above is in tests/
 
-target_compile_options(qmkcore PRIVATE
+target_compile_features(qmkcore PRIVATE c_std_11)
+target_compile_features(qmkcore PRIVATE cxx_std_14)
+
+set(qmkcore_compile_options
     -funsigned-char -funsigned-bitfields -ffunction-sections -fdata-sections
     -fshort-enums -fno-inline-small-functions -fno-strict-aliasing
     -fdiagnostics-color -Wall -Wstrict-prototypes -Werror -fcommon
     -include ${qmk_root}/tests/basic/config.h
     )
+target_compile_options(qmkcore PRIVATE ${qmkcore_compile_options})
 
 set(common_compile_definitions
     PRINTF_SUPPORT_DECIMAL_SPECIFIERS=0
@@ -120,11 +124,10 @@ set(common_compile_definitions
     PRINTF_SUPPORT_WRITEBACK_SPECIFIER=0
     SUPPORT_MSVC_STYLE_INTEGER_SPECIFIERS=0
     PRINTF_ALIAS_STANDARD_FUNCTION_NAMES=1
-    KEYMAP_C=${qmk_root}/tests/test_common/keymap.c
+    KEYMAP_C="${qmk_root}/tests/test_common/keymap.c"
     )
 
 target_compile_definitions(qmkcore PRIVATE ${common_compile_definitions})
-
 
 set(common_include_directories
     ${qmk_root}/tmk_core
@@ -154,9 +157,7 @@ target_include_directories(qmkcore PRIVATE ${common_include_directories})
 
 # tests/test_common/common_config.h 
 
-
-add_library(qmktest
-    ${qmk_root}/tests/test_common/matrix.c
+set(tests_test_common_srcs
     ${qmk_root}/tests/test_common/test_driver.cpp
     ${qmk_root}/tests/test_common/keyboard_report_util.cpp
     ${qmk_root}/tests/test_common/keycode_util.cpp
@@ -164,25 +165,36 @@ add_library(qmktest
     ${qmk_root}/tests/test_common/test_fixture.cpp
     ${qmk_root}/tests/test_common/test_keymap_key.cpp
     ${qmk_root}/tests/test_common/test_logger.cpp
+    )
+
+set(tests_basic_srcs
     ${qmk_root}/tests/basic/test_action_layer.cpp
     ${qmk_root}/tests/basic/test_keycode_util.cpp
     ${qmk_root}/tests/basic/test_keypress.cpp
     ${qmk_root}/tests/basic/test_one_shot_keys.cpp
     ${qmk_root}/tests/basic/test_tapping.cpp
+    )
+
+add_executable(testqmk
+    ${tests_test_common_srcs}
+    ${tests_basic_srcs}
     ${qmk_root}/tests/test_common/main.cpp
     )
 
-target_compile_options(qmktest PRIVATE
+set(tests_compile_options
     -funsigned-char -funsigned-bitfields -ffunction-sections -fdata-sections
     -fshort-enums -fno-exceptions -w -Wall -Wundef -Werror
     -include ${qmk_root}/tests/basic/config.h
     )
+# target_compile_options(qmktest PRIVATE ${qmktest_compile_options})
 
-target_compile_definitions(qmktest PRIVATE ${common_definitions})
-target_include_directories(qmktest PRIVATE ${common_include_directories})
+# target_compile_features(qmktest PRIVATE c_std_11)
+# target_compile_features(qmktest PRIVATE cxx_std_14)
+# target_compile_definitions(qmktest PRIVATE ${common_definitions})
+# target_include_directories(qmktest PRIVATE ${common_include_directories})
 
-target_compile_features(qmktest PRIVATE c_std_11)
-target_compile_features(qmktest PRIVATE cxx_std_14)
+# target_link_libraries(qmktest PRIVATE GTest::gmock)
+
 
 # target_link_directories   (qmktest PRIVATE ${slate_dir}/lib)
 # target_link_libraries     (qmktest PRIVATE slate blaspp lapackpp)
@@ -193,17 +205,18 @@ target_compile_features(qmktest PRIVATE cxx_std_14)
 # tests/test_common/common_config.h 
 # . removed
 
-
-
-add_executable(testqmk)
+target_compile_options(testqmk PRIVATE ${tests_compile_options})
+target_compile_definitions(testqmk PRIVATE ${common_compile_definitions})
+target_include_directories(testqmk PRIVATE ${common_include_directories})
+target_compile_features(testqmk PRIVATE c_std_11)
+target_compile_features(testqmk PRIVATE cxx_std_14)
 
 target_link_libraries(testqmk
-  # GTest::gtest_main
+  qmkcore
   GTest::gtest
   GTest::gmock
-  qmkcore
-  qmktest
 )
 
+enable_testing()
 include(GoogleTest)
 gtest_discover_tests(testqmk)
