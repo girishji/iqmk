@@ -16,6 +16,7 @@ ExternalProject_Add(qmk
         -DGIT_REPO=https://github.com/qmk/qmk_firmware.git
         -DGIT_TAG=d2892685c52a8a0892b28872cfc43e8f7fa37465
         -DGIT_SUB_DIRS=${escaped_dirs}
+        -DGIT_SUB_MODULES=lib/printf
         -P @PROJECT_SOURCE_DIR@/cmake/git_sparse_clone.cmake
     PREFIX "@CMAKE_BINARY_DIR@/qmk_firmware"
     CONFIGURE_COMMAND ""
