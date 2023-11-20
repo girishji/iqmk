@@ -150,6 +150,7 @@ set(qmk_common_srcs
     )
 
 set(tests_common_srcs
+    ${qmk_root}/tests/test_common/matrix.c
     ${qmk_root}/tests/test_common/test_driver.cpp
     ${qmk_root}/tests/test_common/keyboard_report_util.cpp
     ${qmk_root}/tests/test_common/keycode_util.cpp
@@ -157,27 +158,23 @@ set(tests_common_srcs
     ${qmk_root}/tests/test_common/test_fixture.cpp
     ${qmk_root}/tests/test_common/test_keymap_key.cpp
     ${qmk_root}/tests/test_common/test_logger.cpp
-    ${qmk_root}/tests/test_common/matrix.c
     ${qmk_root}/tests/test_common/main.cpp
     )
+
+enable_testing()
+include(GoogleTest)
+
+## basic
 
 # cmake discourages glob but in this situation it is convenient
 # https://cmake.org/cmake/help/latest/command/file.html#glob
 set(globdir ${qmk_root}/tests/basic)
-file(GLOB tests_basic_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
-
-# set(tests_basic_srcs
-#     ${qmk_root}/tests/basic/test_action_layer.cpp
-#     ${qmk_root}/tests/basic/test_keycode_util.cpp
-#     ${qmk_root}/tests/basic/test_keypress.cpp
-#     ${qmk_root}/tests/basic/test_one_shot_keys.cpp
-#     ${qmk_root}/tests/basic/test_tapping.cpp
-#     )
+file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
 
 add_executable(test_basic
     ${qmk_common_srcs}
     ${tests_common_srcs}
-    ${tests_basic_srcs}
+    ${tests_srcs}
     )
 
 target_compile_options(test_basic PRIVATE -include ${qmk_root}/tests/basic/config.h)
@@ -187,88 +184,27 @@ target_link_libraries(test_basic
   GTest::gtest
   GTest::gmock
 )
-
-enable_testing()
-include(GoogleTest)
 gtest_discover_tests(test_basic)
 
+## auto_shift
+set(globdir ${qmk_root}/tests/auto_shift)
+file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
 
+add_executable(test_auto_shift
+    ${qmk_common_srcs}
+    ${tests_common_srcs}
+    ${tests_srcs}
+    ${qmk_root}/quantum/process_keycode/process_auto_shift.c
+    )
 
+target_compile_definitions(test_auto_shift PRIVATE AUTO_SHIFT_ENABLE)
+target_compile_options(test_auto_shift PRIVATE -include ${qmk_root}/tests/auto_shift/config.h)
 
-# target_compile_features(qmkcore PRIVATE c_std_11)
-# target_compile_features(qmkcore PRIVATE cxx_std_14)
+target_link_libraries(test_auto_shift
+  compiler_flags
+  GTest::gtest
+  GTest::gmock
+)
+gtest_discover_tests(test_auto_shift)
 
-# set(qmkcore_compile_options
-#     -funsigned-char -funsigned-bitfields -ffunction-sections -fdata-sections
-#     -fshort-enums -fno-inline-small-functions -fno-strict-aliasing
-#     -fdiagnostics-color -Wall -Wstrict-prototypes -Werror -fcommon
-#     -include ${qmk_root}/tests/basic/config.h
-#     )
-# target_compile_options(qmkcore PRIVATE ${qmkcore_compile_options})
-
-# set(common_compile_definitions
-#     )
-
-# target_compile_definitions(qmkcore PRIVATE ${common_compile_definitions})
-
-# set(common_include_directories
-# )
-
-# target_include_directories(qmkcore PRIVATE ${common_include_directories})
-
-# # tests/test_common/common_config.h 
-
-# set(tests_test_common_srcs
-#     ${qmk_root}/tests/test_common/test_driver.cpp
-#     ${qmk_root}/tests/test_common/keyboard_report_util.cpp
-#     ${qmk_root}/tests/test_common/keycode_util.cpp
-#     ${qmk_root}/tests/test_common/keycode_table.cpp
-#     ${qmk_root}/tests/test_common/test_fixture.cpp
-#     ${qmk_root}/tests/test_common/test_keymap_key.cpp
-#     ${qmk_root}/tests/test_common/test_logger.cpp
-#     )
-
-# set(tests_basic_srcs
-#     ${qmk_root}/tests/basic/test_action_layer.cpp
-#     ${qmk_root}/tests/basic/test_keycode_util.cpp
-#     ${qmk_root}/tests/basic/test_keypress.cpp
-#     ${qmk_root}/tests/basic/test_one_shot_keys.cpp
-#     ${qmk_root}/tests/basic/test_tapping.cpp
-#     )
-
-# add_executable(testqmk
-#     ${tests_test_common_srcs}
-#     ${tests_basic_srcs}
-#     ${qmk_root}/tests/test_common/main.cpp
-#     )
-
-# set(tests_compile_options
-#     -funsigned-char -funsigned-bitfields -ffunction-sections -fdata-sections
-#     -fshort-enums -fno-exceptions -w -Wall -Wundef -Werror
-#     -include ${qmk_root}/tests/basic/config.h
-#     )
-# # target_compile_options(qmktest PRIVATE ${qmktest_compile_options})
-
-# # target_compile_features(qmktest PRIVATE c_std_11)
-# # target_compile_features(qmktest PRIVATE cxx_std_14)
-# # target_compile_definitions(qmktest PRIVATE ${common_definitions})
-# # target_include_directories(qmktest PRIVATE ${common_include_directories})
-
-# # target_link_libraries(qmktest PRIVATE GTest::gmock)
-
-
-# # target_link_directories   (qmktest PRIVATE ${slate_dir}/lib)
-# # target_link_libraries     (qmktest PRIVATE slate blaspp lapackpp)
-# # set_property(TARGET 1D_DFT PROPERTY BUILD_RPATH "${slate_dir}/lib")
-
-# # string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${dirs_list}")
-
-# # tests/test_common/common_config.h 
-# # . removed
-
-# target_compile_options(testqmk PRIVATE ${tests_compile_options})
-# target_compile_definitions(testqmk PRIVATE ${common_compile_definitions})
-# target_include_directories(testqmk PRIVATE ${common_include_directories})
-# target_compile_features(testqmk PRIVATE c_std_11)
-# target_compile_features(testqmk PRIVATE cxx_std_14)
 
