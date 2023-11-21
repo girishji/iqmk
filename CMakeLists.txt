@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(
     kefir
     VERSION 0.1.0
-    DESCRIPTION "Essential QMK Sans Middleware"
+    DESCRIPTION "QMK plus"
     HOMEPAGE_URL https://github.com/girishji/kefir
     LANGUAGES ASM C CXX
 )
@@ -164,68 +164,83 @@ set(tests_common_srcs
 enable_testing()
 include(GoogleTest)
 
-## basic
+foreach(test_fixture
+        # auto_shift
+        # autocorrect
+        # basic
+        # caps_word
+        # caps_word/caps_word_autoshift
+        caps_word/caps_word_combo
+        # caps_word_invert_on_shift
+        # caps_word_unicodemap
+        # combo
+        # leader
+        # leader_no_initial_timeout
+        # leader_per_key_timeout
+        # leader_strict_key_processing
+        # no_action_tapping
+        # no_mod_tap_mods
+        # repeat_key
+        # alt_repeat_key
+        # repeat_key_combo
+        # secure
+        # tap_dance
+        )
 
-# cmake discourages glob but in this situation it is convenient
-# https://cmake.org/cmake/help/latest/command/file.html#glob
-set(globdir ${qmk_root}/tests/basic)
-file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
+    # cmake discourages glob but in this situation it is convenient
+    # https://cmake.org/cmake/help/latest/command/file.html#glob
+    set(globdir ${qmk_root}/tests/${test_fixture})
+    file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
 
-add_executable(test_basic
-    ${qmk_common_srcs}
-    ${tests_common_srcs}
-    ${tests_srcs}
+    get_filename_component(barename ${test_fixture} NAME)
+    set(tname "test_${barename}")
+    add_executable(${tname}
+        ${qmk_common_srcs}
+        ${tests_common_srcs}
+        ${tests_srcs}
+        )
+    target_link_libraries(${tname}
+        compiler_flags
+        GTest::gtest
+        GTest::gmock
+        )
+    gtest_discover_tests(${tname})
+endforeach()
+
+# ## basic
+# target_compile_options(test_basic PRIVATE -include ${qmk_root}/tests/basic/config.h)
+# ## auto_shift
+# target_sources(test_auto_shift PRIVATE ${qmk_root}/quantum/process_keycode/process_auto_shift.c)
+# target_compile_definitions(test_auto_shift PRIVATE AUTO_SHIFT_ENABLE)
+# target_compile_options(test_auto_shift PRIVATE -include ${qmk_root}/tests/auto_shift/config.h)
+# ## autocorrect
+# target_sources(test_autocorrect PRIVATE
+#     ${qmk_root}/quantum/process_keycode/process_autocorrect.c)
+# target_compile_options(test_autocorrect PRIVATE -include ${qmk_root}/tests/autocorrect/config.h)
+# target_compile_definitions(test_autocorrect PRIVATE AUTOCORRECT_ENABLE)
+# ## caps_word
+# target_sources(test_caps_word PRIVATE
+#     ${qmk_root}/quantum/caps_word.c
+#     ${qmk_root}/quantum/process_keycode/process_caps_word.c
+#     )
+# target_compile_options(test_caps_word PRIVATE -include ${qmk_root}/tests/caps_word/config.h)
+# target_compile_definitions(test_caps_word PRIVATE CAPS_WORD_ENABLE SPACE_CADET_ENABLE)
+
+# ## caps_word_autoshift
+# target_sources(test_caps_word_autoshift PRIVATE
+#     ${qmk_root}/quantum/caps_word.c
+#     ${qmk_root}/quantum/process_keycode/process_auto_shift.c
+#     ${qmk_root}/quantum/process_keycode/process_caps_word.c
+#     )
+# target_compile_options(test_caps_word_autoshift PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_autoshift/config.h)
+# target_compile_definitions(test_caps_word_autoshift PRIVATE CAPS_WORD_ENABLE AUTO_SHIFT_ENABLE)
+
+# target_sources(test_caps_word_combo PRIVATE
+#     ${qmk_root}/quantum/caps_word.c
+#     ${qmk_root}/quantum/process_keycode/process_auto_shift.c
+#     ${qmk_root}/quantum/process_keycode/process_caps_word.c)
+target_compile_options(test_caps_word_combo PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_combo/config.h)
+target_compile_definitions(test_caps_word_combo PRIVATE
+    CAPS_WORD_ENABLE AUTO_SHIFT_ENABLE COMBO_ENABLE
+    INTROSPECTION_KEYMAP_C="${qmk_root}/tests/caps_word/caps_word_combo/test_combos.c"
     )
-
-target_compile_options(test_basic PRIVATE -include ${qmk_root}/tests/basic/config.h)
-
-target_link_libraries(test_basic
-  compiler_flags
-  GTest::gtest
-  GTest::gmock
-)
-gtest_discover_tests(test_basic)
-
-## auto_shift
-set(globdir ${qmk_root}/tests/auto_shift)
-file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
-
-add_executable(test_auto_shift
-    ${qmk_common_srcs}
-    ${tests_common_srcs}
-    ${tests_srcs}
-    ${qmk_root}/quantum/process_keycode/process_auto_shift.c
-    )
-
-target_compile_definitions(test_auto_shift PRIVATE AUTO_SHIFT_ENABLE)
-target_compile_options(test_auto_shift PRIVATE -include ${qmk_root}/tests/auto_shift/config.h)
-
-target_link_libraries(test_auto_shift
-  compiler_flags
-  GTest::gtest
-  GTest::gmock
-)
-gtest_discover_tests(test_auto_shift)
-
-## autocorrect
-set(globdir ${qmk_root}/tests/autocorrect)
-file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
-
-add_executable(test_autocorrect
-    ${qmk_common_srcs}
-    ${tests_common_srcs}
-    ${tests_srcs}
-    ${qmk_root}/quantum/process_keycode/process_autocorrect.c
-    ${qmk_root}/tests/autocorrect/test_autocorrect.cpp
-    )
-
-target_compile_definitions(test_autocorrect PRIVATE AUTOCORRECT_ENABLE)
-target_compile_options(test_autocorrect PRIVATE -include ${qmk_root}/tests/autocorrect/config.h)
-
-target_link_libraries(test_autocorrect
-  compiler_flags
-  GTest::gtest
-  GTest::gmock
-)
-gtest_discover_tests(test_autocorrect)
-
