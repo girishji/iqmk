@@ -207,4 +207,25 @@ target_link_libraries(test_auto_shift
 )
 gtest_discover_tests(test_auto_shift)
 
+## autocorrect
+set(globdir ${qmk_root}/tests/autocorrect)
+file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
+
+add_executable(test_autocorrect
+    ${qmk_common_srcs}
+    ${tests_common_srcs}
+    ${tests_srcs}
+    ${qmk_root}/quantum/process_keycode/process_autocorrect.c
+    ${qmk_root}/tests/autocorrect/test_autocorrect.cpp
+    )
+
+target_compile_definitions(test_autocorrect PRIVATE AUTOCORRECT_ENABLE)
+target_compile_options(test_autocorrect PRIVATE -include ${qmk_root}/tests/autocorrect/config.h)
+
+target_link_libraries(test_autocorrect
+  compiler_flags
+  GTest::gtest
+  GTest::gmock
+)
+gtest_discover_tests(test_autocorrect)
 
