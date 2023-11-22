@@ -3,7 +3,7 @@
 # ExternalProject_Add() is placed in the main project's CMakeLists.txt file).
 # https://crascit.com/2015/07/25/cmake-gtest/
 
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 project(qmk-download NONE)
 
 # clone only essential directories

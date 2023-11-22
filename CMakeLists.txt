@@ -1,7 +1,7 @@
 # Copyright 2023 FMK (Girish Palya)
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 # add_compile_options(-g -Og -w -Wall -Wundef -Werror)
 
@@ -164,7 +164,7 @@ set(tests_common_srcs
 enable_testing()
 include(GoogleTest)
 
-foreach(test_fixture
+foreach(fixture
         # auto_shift
         # autocorrect
         # basic
@@ -189,10 +189,10 @@ foreach(test_fixture
 
     # cmake discourages glob but in this situation it is convenient
     # https://cmake.org/cmake/help/latest/command/file.html#glob
-    set(globdir ${qmk_root}/tests/${test_fixture})
+    set(globdir ${qmk_root}/tests/${fixture})
     file(GLOB tests_srcs CONFIGURE_DEPENDS "${globdir}/*.h" "${globdir}/*.cpp")
 
-    get_filename_component(barename ${test_fixture} NAME)
+    cmake_path(GET fixture FILENAME barename)
     set(tname "test_${barename}")
     add_executable(${tname}
         ${qmk_common_srcs}
@@ -265,7 +265,11 @@ target_sources(test_caps_word_unicodemap PRIVATE
     ${qmk_root}/quantum/process_keycode/process_caps_word.c
     ${qmk_root}/quantum/unicode/unicodemap.c
     ${qmk_root}/quantum/process_keycode/process_unicodemap.c
+    ${qmk_root}/quantum/process_keycode/process_unicode_common.c
+    ${qmk_root}/quantum/unicode/unicode.c
+    ${qmk_root}/quantum/unicode/utf8.c
     )
+
 target_compile_options(test_caps_word_unicodemap PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_unicodemap/config.h)
 target_compile_definitions(test_caps_word_unicodemap PRIVATE CAPS_WORD_ENABLE UNICODEMAP_ENABLE)
 target_include_directories(test_caps_word_unicodemap PRIVATE ${qmk_root}/quantum/unicode)
