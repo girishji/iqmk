@@ -271,5 +271,5 @@ target_sources(test_caps_word_unicodemap PRIVATE
     )
 
 target_compile_options(test_caps_word_unicodemap PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_unicodemap/config.h)
-target_compile_definitions(test_caps_word_unicodemap PRIVATE CAPS_WORD_ENABLE UNICODEMAP_ENABLE)
+target_compile_definitions(test_caps_word_unicodemap PRIVATE CAPS_WORD_ENABLE UNICODEMAP_ENABLE UNICODE_COMMON_ENABLE)
 target_include_directories(test_caps_word_unicodemap PRIVATE ${qmk_root}/quantum/unicode)
