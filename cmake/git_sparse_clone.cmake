@@ -5,8 +5,6 @@
 
 # https://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository/52269934#52269934
 
-message("girish subdirs ${GIT_SUB_DIRS} ${GIT_REPO}")
-
 if(NOT DEFINED GIT_REPO OR NOT DEFINED GIT_TAG)
     message(FATAL_ERROR "Unspecified git repo")
 endif()

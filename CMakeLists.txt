@@ -170,9 +170,9 @@ foreach(test_fixture
         # basic
         # caps_word
         # caps_word/caps_word_autoshift
-        caps_word/caps_word_combo
-        # caps_word_invert_on_shift
-        # caps_word_unicodemap
+        # caps_word/caps_word_combo
+        # caps_word/caps_word_invert_on_shift
+        caps_word/caps_word_unicodemap
         # combo
         # leader
         # leader_no_initial_timeout
@@ -209,15 +209,18 @@ endforeach()
 
 # ## basic
 # target_compile_options(test_basic PRIVATE -include ${qmk_root}/tests/basic/config.h)
+
 # ## auto_shift
 # target_sources(test_auto_shift PRIVATE ${qmk_root}/quantum/process_keycode/process_auto_shift.c)
 # target_compile_definitions(test_auto_shift PRIVATE AUTO_SHIFT_ENABLE)
 # target_compile_options(test_auto_shift PRIVATE -include ${qmk_root}/tests/auto_shift/config.h)
+
 # ## autocorrect
 # target_sources(test_autocorrect PRIVATE
 #     ${qmk_root}/quantum/process_keycode/process_autocorrect.c)
 # target_compile_options(test_autocorrect PRIVATE -include ${qmk_root}/tests/autocorrect/config.h)
 # target_compile_definitions(test_autocorrect PRIVATE AUTOCORRECT_ENABLE)
+
 # ## caps_word
 # target_sources(test_caps_word PRIVATE
 #     ${qmk_root}/quantum/caps_word.c
@@ -235,12 +238,34 @@ endforeach()
 # target_compile_options(test_caps_word_autoshift PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_autoshift/config.h)
 # target_compile_definitions(test_caps_word_autoshift PRIVATE CAPS_WORD_ENABLE AUTO_SHIFT_ENABLE)
 
+# ## caps_word_combo
 # target_sources(test_caps_word_combo PRIVATE
+#     ${qmk_root}/quantum/process_keycode/process_combo.c
 #     ${qmk_root}/quantum/caps_word.c
 #     ${qmk_root}/quantum/process_keycode/process_auto_shift.c
-#     ${qmk_root}/quantum/process_keycode/process_caps_word.c)
-target_compile_options(test_caps_word_combo PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_combo/config.h)
-target_compile_definitions(test_caps_word_combo PRIVATE
-    CAPS_WORD_ENABLE AUTO_SHIFT_ENABLE COMBO_ENABLE
-    INTROSPECTION_KEYMAP_C="${qmk_root}/tests/caps_word/caps_word_combo/test_combos.c"
+#     ${qmk_root}/quantum/process_keycode/process_caps_word.c
+#     )
+# target_compile_options(test_caps_word_combo PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_combo/config.h)
+# target_compile_definitions(test_caps_word_combo PRIVATE
+#     CAPS_WORD_ENABLE AUTO_SHIFT_ENABLE COMBO_ENABLE
+#     INTROSPECTION_KEYMAP_C="${qmk_root}/tests/caps_word/caps_word_combo/test_combos.c"
+#     )
+
+# ## caps_word_invert_on_shift
+# target_sources(test_caps_word_invert_on_shift PRIVATE
+#     ${qmk_root}/quantum/caps_word.c
+#     ${qmk_root}/quantum/process_keycode/process_caps_word.c
+#     )
+# target_compile_options(test_caps_word_invert_on_shift PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_invert_on_shift/config.h)
+# target_compile_definitions(test_caps_word_invert_on_shift PRIVATE CAPS_WORD_ENABLE)
+
+## caps_word_unicodemap
+target_sources(test_caps_word_unicodemap PRIVATE
+    ${qmk_root}/quantum/caps_word.c
+    ${qmk_root}/quantum/process_keycode/process_caps_word.c
+    ${qmk_root}/quantum/unicode/unicodemap.c
+    ${qmk_root}/quantum/process_keycode/process_unicodemap.c
     )
+target_compile_options(test_caps_word_unicodemap PRIVATE -include ${qmk_root}/tests/caps_word/caps_word_unicodemap/config.h)
+target_compile_definitions(test_caps_word_unicodemap PRIVATE CAPS_WORD_ENABLE UNICODEMAP_ENABLE)
+target_include_directories(test_caps_word_unicodemap PRIVATE ${qmk_root}/quantum/unicode)
