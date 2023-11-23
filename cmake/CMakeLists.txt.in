@@ -1,3 +1,6 @@
+# Copyright 2023 Girish Palya
+# SPDX-License-Identifier: MIT
+
 # The purpose of this file is to let cmake download and build qmk during the
 # main project’s configure phase, not build phase (which is what happens if
 # ExternalProject_Add() is placed in the main project's CMakeLists.txt file).

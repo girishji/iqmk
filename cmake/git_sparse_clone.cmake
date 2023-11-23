@@ -1,3 +1,6 @@
+# Copyright 2023 Girish Palya
+# SPDX-License-Identifier: MIT
+
 # cmake module do download only required subdirs from repository
 #   GIT_REPO        - url to git repository
 #   GIT_SUB_DIRS    - relative path of subdirs to download
