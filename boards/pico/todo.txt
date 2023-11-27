@@ -1,0 +1,30 @@
+The default Raspberry Pi Pico UART TX pin (out from Raspberry Pi Pico) is pin GP0, and the UART RX pin (in to
+Raspberry Pi Pico) is pin GP1. The default UART pins are configured on a per-board basis using board configuration
+files. The Raspberry Pi Pico configuration can be found in https://github.com/raspberrypi/pico-sdk/blob/master/
+src/boards/include/boards/pico.h. The SDK defaults to a board name of Raspberry Pi Pico if no other board is
+specified.
+
+The destination for stdout can be changed using CMake directives, with output directed to UART or USB CDC, or to both,
+pico_enable_stdio_usb(hello_world 1) ①
+pico_enable_stdio_uart(hello_world 0) ②
+1. Enable printf output via USB CDC (USB serial)
+2. Disable printf output via UART
+
+If you are intending to using SWD for debugging (see Chapter 6) you need to use a UART based serial connection as
+the USB stack will be paused when the RP2040 cores are stopped during debugging, which will cause any attached
+USB devices to disconnect.
+
+ Powering the board
+You can unplug the Raspberry Pi Pico from USB, and power the board by additionally connecting the Raspberry Pi’s 5V
+pin to the Raspberry Pi Pico VSYS pin via a diode, see Figure 5, where in the ideal case the diode would be a Schottky
+diode.
+
+--
+
+eeprom: rgblight, os detection, dynamic kb, etc use eeprom to store data
+https://forums.raspberrypi.com/viewtopic.php?t=305570
+https://forums.raspberrypi.com/viewtopic.php?t=311633
+
+--
+
+

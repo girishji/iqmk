@@ -9,9 +9,16 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 project(qmk-download NONE)
 
+if(NOT DEFINED QMK_DIRS)
+    message(WARNING "Unspecified qmk dirs, cloning all dirs")
+    set(QMK_DIRS '')
+endif()
+
 # clone only essential directories
-set(dirs_list /tests/ /quantum/ /tmk_core/ /drivers/ /platforms/ /lib/)
-string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${dirs_list}")
+# set(dirs_list /tests/ /quantum/ /tmk_core/ /drivers/ /platforms/ /lib/)
+# string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${dirs_list}")
+string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${QMK_DIRS}")
+string(REPLACE ";" "$<SEMICOLON>" escaped_submodules "${QMK_SUB_MODULES}")
 
 include(ExternalProject)
 ExternalProject_Add(qmk
