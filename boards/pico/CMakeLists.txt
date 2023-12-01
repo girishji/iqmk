@@ -18,8 +18,9 @@ endif()
 
 # Fetch a shallow clone of qmk repository with only essential files
 configure_file(../../cmake/CMakeLists.txt.in qmk_download/CMakeLists.txt @ONLY)
-set(QMK_DIRS /quantum/ /tmk_core/)
+set(QMK_DIRS /quantum/ /tmk_core/ /platforms/)
 string(REPLACE ";" "$<SEMICOLON>" ESCAPED_QMK_DIRS "${QMK_DIRS}")
+set(QMK_SUB_MODULES lib/printf)
 execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" -D QMK_DIRS=${ESCAPED_QMK_DIRS} .
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qmk_download"
 )
@@ -32,9 +33,78 @@ set(qmk_root ${CMAKE_BINARY_DIR}/qmk_firmware/src)
 
 add_library(qmk_core STATIC
     ${qmk_root}/quantum/quantum.c
+    ${qmk_root}/quantum/bitwise.c
+    ${qmk_root}/quantum/led.c
+    ${qmk_root}/quantum/action.c
+    ${qmk_root}/quantum/action_layer.c
+    ${qmk_root}/quantum/action_tapping.c
+    ${qmk_root}/quantum/action_util.c
+    # ${qmk_root}/quantum/eeconfig.c
+    ${qmk_root}/quantum/keyboard.c
+    ${qmk_root}/quantum/keymap_common.c
+    ${qmk_root}/quantum/keycode_config.c
+    ${qmk_root}/quantum/sync_timer.c
+    ${qmk_root}/quantum/logging/debug.c
+    ${qmk_root}/quantum/logging/sendchar.c
+    ${qmk_root}/quantum/logging/print.c
+    ${qmk_root}/quantum/bootmagic/magic.c
+    # ${qmk_root}/quantum/matrix_common.c
+    ${qmk_root}/quantum/debounce/sym_defer_g.c
+
+    ${qmk_root}/quantum/process_keycode/process_magic.c
+    ${qmk_root}/quantum/send_string/send_string.c
+    ${qmk_root}/quantum/process_keycode/process_grave_esc.c
+    ${qmk_root}/quantum/process_keycode/process_space_cadet.c
+    ${qmk_root}/quantum/keymap_introspection.c
+    ${qmk_root}/lib/printf/src/printf/printf.c
+
+    ${qmk_root}/platforms/suspend.c
+    ${qmk_root}/platforms/synchronization_util.c
+    ${qmk_root}/platforms/timer.c
+    
+    ${qmk_root}/tmk_core/protocol/host.c
+    ${qmk_root}/tmk_core/protocol/report.c
+    ${qmk_root}/tmk_core/protocol/usb_device_state.c
+    ${qmk_root}/tmk_core/protocol/usb_util.c
 )
-set(qmk_compile_flags -Os -Wall -Werror)
-target_compile_options(qmk_core PRIVATE ${qmk_compile_flags})
+    # ${qmk_root}/platforms/test/eeprom.c
+    # ${qmk_root}/platforms/test/hardware_id.c
+    # ${qmk_root}/platforms/test/platform.c
+    # ${qmk_root}/platforms/test/suspend.c
+    # ${qmk_root}/platforms/test/timer.c
+    # ${qmk_root}/platforms/test/bootloaders/none.c
+
+target_compile_features(qmk_core PRIVATE c_std_11)
+target_compile_features(qmk_core PRIVATE cxx_std_14)
+target_compile_options(qmk_core PRIVATE
+    -Os -Wall -Werror -Wstrict-prototypes
+    -include ${CMAKE_CURRENT_SOURCE_DIR}/layouts/test/config.h)
+target_compile_definitions(qmk_core PRIVATE
+    MAGIC_KEYCODE_ENABLE
+    SEND_STRING_ENABLE
+    PRINTF_SUPPORT_DECIMAL_SPECIFIERS=0
+    PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS=0
+    PRINTF_SUPPORT_LONG_LONG=0
+    PRINTF_SUPPORT_WRITEBACK_SPECIFIER=0
+    SUPPORT_MSVC_STYLE_INTEGER_SPECIFIERS=0
+    PRINTF_ALIAS_STANDARD_FUNCTION_NAMES=1
+    KEYMAP_C="${CMAKE_CURRENT_SOURCE_DIR}/layouts/test/keymap.c"
+)
+target_include_directories(qmk_core PRIVATE
+    ${qmk_root}/tmk_core
+    ${qmk_root}/quantum
+    ${qmk_root}/quantum/keymap_extras
+    ${qmk_root}/quantum/process_keycode
+    ${qmk_root}/quantum/sequencer
+    ${qmk_root}/quantum/bootmagic
+    ${qmk_root}/quantum/send_string
+    ${qmk_root}/quantum/logging
+    ${qmk_root}/platforms
+    ${qmk_root}/tmk_core/protocol
+    ${qmk_root}/lib/printf/src
+    ${qmk_root}/lib/printf/src/printf
+    qmk_shim
+)
 
 
 # pico kb

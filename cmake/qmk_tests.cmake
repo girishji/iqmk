@@ -87,8 +87,6 @@ target_include_directories(qmk_compiler_flags INTERFACE
     ${qmk_root}/platforms/test
     ${qmk_root}/platforms/test/drivers
     ${qmk_root}/tmk_core/protocol
-    ${qmk_root}/lib/printf/src
-    ${qmk_root}/lib/printf/src/printf
     ${qmk_root}/tests/test_common
 )
 
