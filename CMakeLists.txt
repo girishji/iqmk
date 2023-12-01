@@ -23,6 +23,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+
 project(
     kefir
     VERSION 0.1.0
@@ -31,14 +33,10 @@ project(
     LANGUAGES ASM C CXX
 )
 
-# set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-
-# set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if(QMK_BUILD_TYPE STREQUAL Test)
-    # include(cmake/qmk_tests.cmake)
-    # include(cmake/qmk_tests)
-    add_subdirectory(tests)
+    include(qmk_tests)
 elseif(QMK_BUILD_TYPE STREQUAL Pico)
     add_subdirectory(boards/pico)
 endif()
