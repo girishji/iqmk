@@ -2,5 +2,5 @@
 mkdir -p build \
     && cd build \
     && cmake -DQMK_BUILD_TYPE:STRING=Test .. \
-    && cmake --build . -j \
+    && cmake --build . \
     && ctest
