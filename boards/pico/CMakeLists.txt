@@ -48,7 +48,7 @@ add_library(qmk_core STATIC
     ${qmk_root}/quantum/logging/sendchar.c
     ${qmk_root}/quantum/logging/print.c
     ${qmk_root}/quantum/bootmagic/magic.c
-    # ${qmk_root}/quantum/matrix_common.c
+    ${qmk_root}/quantum/matrix_common.c
     ${qmk_root}/quantum/debounce/sym_defer_g.c
 
     ${qmk_root}/quantum/process_keycode/process_magic.c
@@ -103,7 +103,7 @@ target_include_directories(qmk_core PRIVATE
     ${qmk_root}/tmk_core/protocol
     ${qmk_root}/lib/printf/src
     ${qmk_root}/lib/printf/src/printf
-    qmk_shim
+    qmkshim
 )
 
 
