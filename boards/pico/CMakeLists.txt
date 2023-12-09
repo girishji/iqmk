@@ -39,7 +39,7 @@ add_library(qmk_core STATIC
     ${qmk_root}/quantum/action_layer.c
     ${qmk_root}/quantum/action_tapping.c
     ${qmk_root}/quantum/action_util.c
-    # ${qmk_root}/quantum/eeconfig.c
+    ${qmk_root}/quantum/eeconfig.c
     ${qmk_root}/quantum/keyboard.c
     ${qmk_root}/quantum/keymap_common.c
     ${qmk_root}/quantum/keycode_config.c
@@ -89,7 +89,10 @@ target_compile_definitions(qmk_core PRIVATE
     SUPPORT_MSVC_STYLE_INTEGER_SPECIFIERS=0
     PRINTF_ALIAS_STANDARD_FUNCTION_NAMES=1
     KEYMAP_C="${CMAKE_CURRENT_SOURCE_DIR}/layouts/test/keymap.c"
+    EEPROM_CUSTOM
+    EEPROM_SIZE=0
 )
+
 target_include_directories(qmk_core PRIVATE
     ${qmk_root}/tmk_core
     ${qmk_root}/quantum
@@ -103,20 +106,33 @@ target_include_directories(qmk_core PRIVATE
     ${qmk_root}/tmk_core/protocol
     ${qmk_root}/lib/printf/src
     ${qmk_root}/lib/printf/src/printf
-    qmkshim
+    shim
 )
 
 
 # pico kb
 
 add_executable(pico_kb
+    shim/timer.c
+    shim/wait.c
+    shim/eeprom.c
+    shim/bootloader.c
     src/main.c
 )
 
-target_compile_features(pico_kb INTERFACE c_std_11)
-target_compile_features(pico_kb INTERFACE cxx_std_14)
+target_compile_features(pico_kb PRIVATE c_std_11)
+target_compile_features(pico_kb PRIVATE cxx_std_14)
 
-target_link_libraries(pico_kb
+target_compile_definitions(pico_kb PRIVATE
+    EEPROM_CUSTOM
+    EEPROM_SIZE=0
+)
+
+target_include_directories(pico_kb PRIVATE
+    ${qmk_root}/platforms
+)
+
+target_link_libraries(pico_kb PRIVATE
     pico_stdlib
     qmk_core
     # pico_multicore

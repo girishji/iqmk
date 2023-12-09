@@ -27,4 +27,9 @@ https://forums.raspberrypi.com/viewtopic.php?t=311633
 
 --
 
+The functions defined here provide a much more powerful and user friendly wrapping around the low level hardware timer functionality. For these functions (and any other SDK functionality e.g. timeouts, that relies on them) to work correctly, the hardware timer should not be modified. i.e. it is expected to be monotonically increasing once per microsecond. Fortunately there is no need to modify the hardware timer as any functionality you can think of that isn't already covered here can easily be modelled by adding or subtracting a constant value from the unmodified hardware timer.
+
+https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#pico_time
+
+--
 

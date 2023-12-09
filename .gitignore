@@ -2,3 +2,4 @@ build/
 *.swp
 .DS_Store
 qmk_firmware
+boards/pico/todo.txt
