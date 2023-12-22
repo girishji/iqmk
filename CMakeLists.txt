@@ -26,10 +26,10 @@ endif()
 # set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
 project(
-    kefir
+    iqmk
     VERSION 0.1.0
     DESCRIPTION "QMK plus"
-    HOMEPAGE_URL https://github.com/girishji/kefir
+    HOMEPAGE_URL https://github.com/girishji/iqmk
     LANGUAGES ASM C CXX
 )
 
