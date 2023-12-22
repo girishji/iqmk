@@ -5,5 +5,5 @@ Clean, lean, reliable keyboard firmare adapted from [qmk](https://github.com/qmk
 
 It designed to be memory-safe with no dynamic allocation and thread-safe with all interrupt events being deferred and then handled in the non-ISR task function.
 
-This WIP.
+This is WIP. Come back later.
 
