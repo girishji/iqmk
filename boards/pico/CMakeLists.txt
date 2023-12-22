@@ -3,10 +3,6 @@
 
 # cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
-# pull in SDK (must be before project)
-# option(PICO_SDK_FETCH_FROM_GIT "" on)
-# include(cmake/pico_sdk_import.cmake)
-
 # project(pico)
 
 # initialize the sdk
@@ -16,8 +12,25 @@ if (NOT TARGET tinyusb_device)
     message(FATAL_ERROR "TinyUSB is missing")
 endif()
 
+# # Fetch a shallow clone of pico-sdk
+# configure_file(../../cmake/CMakeLists_pico.txt.in pico_sdk/CMakeLists.txt @ONLY)
+# # set(QMK_DIRS /quantum/ /tmk_core/ /platforms/)
+# # string(REPLACE ";" "$<SEMICOLON>" ESCAPED_QMK_DIRS "${QMK_DIRS}")
+# # set(QMK_SUB_MODULES lib/printf)
+# execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+#     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pico_sdk"
+# )
+# execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+#     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pico_sdk"
+# )
+# # set(pico_root ${CMAKE_BINARY_DIR}/pico_sdk/src)
+# # option(PICO_SDK_FETCH_FROM_GIT "" on)
+# set(PICO_SDK_PATH ${CMAKE_BINARY_DIR}/pico_sdk/src)
+# include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+
+
 # Fetch a shallow clone of qmk repository with only essential files
-configure_file(../../cmake/CMakeLists.txt.in qmk_download/CMakeLists.txt @ONLY)
+configure_file(../../cmake/CMakeLists_qmk.txt.in qmk_download/CMakeLists.txt @ONLY)
 set(QMK_DIRS /quantum/ /tmk_core/ /platforms/)
 string(REPLACE ";" "$<SEMICOLON>" ESCAPED_QMK_DIRS "${QMK_DIRS}")
 set(QMK_SUB_MODULES lib/printf)
@@ -109,32 +122,51 @@ target_include_directories(qmk_core PRIVATE
     shim
 )
 
+# shim lib
 
-# pico kb
-
-add_executable(pico_kb
+add_library(shim_lib STATIC
     shim/timer.c
     shim/wait.c
     shim/eeprom.c
     shim/bootloader.c
+    # shim/driver.c
+)
+
+target_compile_features(shim_lib PRIVATE c_std_11)
+target_compile_features(shim_lib PRIVATE cxx_std_14)
+
+target_compile_definitions(shim_lib PRIVATE
+    EEPROM_CUSTOM
+    EEPROM_SIZE=0
+    PROTOCOL_CHIBIOS
+    NKRO_ENABLE
+)
+
+target_include_directories(shim_lib PRIVATE
+    ${qmk_root}/tmk_core
+    ${qmk_root}/platforms
+    ${qmk_root}/quantum
+    ${qmk_root}/tmk_core/protocol
+    shim
+)
+
+target_link_libraries(shim_lib PRIVATE
+    pico_stdlib
+)
+
+# pico kb
+
+add_executable(pico_kb
     src/main.c
 )
 
 target_compile_features(pico_kb PRIVATE c_std_11)
 target_compile_features(pico_kb PRIVATE cxx_std_14)
 
-target_compile_definitions(pico_kb PRIVATE
-    EEPROM_CUSTOM
-    EEPROM_SIZE=0
-)
-
-target_include_directories(pico_kb PRIVATE
-    ${qmk_root}/platforms
-)
-
 target_link_libraries(pico_kb PRIVATE
     pico_stdlib
     qmk_core
+    shim_lib
     # pico_multicore
     # hardware_i2c
 )

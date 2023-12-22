@@ -4,7 +4,7 @@
 # Run all unit tests found under qmk_firmware/tests in the qmk repository.
 
 # Fetch a shallow clone of qmk repository with only essential files
-configure_file(cmake/CMakeLists.txt.in qmk_download/CMakeLists.txt @ONLY)
+configure_file(cmake/CMakeLists_qmk.txt.in qmk_download/CMakeLists.txt @ONLY)
 set(QMK_DIRS /tests/ /quantum/ /tmk_core/ /drivers/ /platforms/ /lib/)
 string(REPLACE ";" "$<SEMICOLON>" ESCAPED_QMK_DIRS "${QMK_DIRS}")
 set(QMK_SUB_MODULES lib/printf)

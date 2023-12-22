@@ -1,0 +1,27 @@
+# Copyright 2023 Girish Palya
+# SPDX-License-Identifier: MIT
+
+# The purpose of this file is to let cmake download and build pico-sdk during the
+# main project’s configure phase, not build phase (which is what happens if
+# ExternalProject_Add() is placed in the main project's CMakeLists.txt file).
+# https://crascit.com/2015/07/25/cmake-gtest/
+
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
+project(pico-sdk-download NONE)
+
+# Note: pico contains following submodules: btstack, cyw43-driver, lwip, mbedtls,
+# tinyusb. If you want to include everything leave GIT_SUB_MODULES variable
+# empty.
+
+include(ExternalProject)
+ExternalProject_Add(pico_sdk
+    DOWNLOAD_COMMAND @CMAKE_COMMAND@
+        -DGIT_REPO=https://github.com/raspberrypi/pico-sdk
+        -DGIT_TAG=master
+        -DGIT_SUB_MODULES=lib/tinyusb
+        -P @CMAKE_SOURCE_DIR@/cmake/git_sparse_clone.cmake
+    PREFIX "@CMAKE_BINARY_DIR@/pico_sdk"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    )

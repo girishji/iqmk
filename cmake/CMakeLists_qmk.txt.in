@@ -14,9 +14,6 @@ if(NOT DEFINED QMK_DIRS)
     set(QMK_DIRS '')
 endif()
 
-# clone only essential directories
-# set(dirs_list /tests/ /quantum/ /tmk_core/ /drivers/ /platforms/ /lib/)
-# string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${dirs_list}")
 string(REPLACE ";" "$<SEMICOLON>" escaped_dirs "${QMK_DIRS}")
 string(REPLACE ";" "$<SEMICOLON>" escaped_submodules "${QMK_SUB_MODULES}")
 
@@ -26,7 +23,7 @@ ExternalProject_Add(qmk
         -DGIT_REPO=https://github.com/qmk/qmk_firmware.git
         -DGIT_TAG=d2892685c52a8a0892b28872cfc43e8f7fa37465
         -DGIT_SUB_DIRS=${escaped_dirs}
-        -DGIT_SUB_MODULES=lib/printf
+        -DGIT_SUB_MODULES=${escaped_submodules}
         -P @PROJECT_SOURCE_DIR@/cmake/git_sparse_clone.cmake
     PREFIX "@CMAKE_BINARY_DIR@/qmk_firmware"
     CONFIGURE_COMMAND ""

@@ -1,4 +1,5 @@
 # This is a copy of <PICO_SDK_PATH>/external/pico_sdk_import.cmake
+#   MODIFIED by Girish
 
 # This can be dropped into an external project to help locate this SDK
 # It should be include()ed prior to project()
@@ -24,33 +25,54 @@ set(PICO_SDK_FETCH_FROM_GIT_PATH "${PICO_SDK_FETCH_FROM_GIT_PATH}" CACHE FILEPAT
 
 if (NOT PICO_SDK_PATH)
     if (PICO_SDK_FETCH_FROM_GIT)
-        include(FetchContent)
-        set(FETCHCONTENT_BASE_DIR_SAVE ${FETCHCONTENT_BASE_DIR})
-        if (PICO_SDK_FETCH_FROM_GIT_PATH)
-            get_filename_component(FETCHCONTENT_BASE_DIR "${PICO_SDK_FETCH_FROM_GIT_PATH}" REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
-        endif ()
-        # GIT_SUBMODULES_RECURSE was added in 3.17
-        if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
-            FetchContent_Declare(
-                    pico_sdk
-                    GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
-                    GIT_TAG master
-                    GIT_SUBMODULES_RECURSE FALSE
-            )
-        else ()
-            FetchContent_Declare(
-                    pico_sdk
-                    GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
-                    GIT_TAG master
-            )
-        endif ()
+        # girish BEGIN
 
-        if (NOT pico_sdk)
-            message("Downloading Raspberry Pi Pico SDK")
-            FetchContent_Populate(pico_sdk)
-            set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
-        endif ()
-        set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})
+        # Fetch a shallow clone of pico-sdk
+        configure_file(cmake/CMakeLists_pico.txt.in pico_sdk/CMakeLists.txt @ONLY)
+        # set(QMK_DIRS /quantum/ /tmk_core/ /platforms/)
+        # string(REPLACE ";" "$<SEMICOLON>" ESCAPED_QMK_DIRS "${QMK_DIRS}")
+        # set(QMK_SUB_MODULES lib/printf)
+        execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pico_sdk"
+        )
+        execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pico_sdk"
+        )
+        # set(pico_root ${CMAKE_BINARY_DIR}/pico_sdk/src)
+        # option(PICO_SDK_FETCH_FROM_GIT "" on)
+        set(PICO_SDK_PATH ${CMAKE_BINARY_DIR}/pico_sdk/src)
+        # include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+        set(FETCHCONTENT_BASE_DIR ${CMAKE_BINARY_DIR}/pico_sdk)
+
+        # include(FetchContent)
+        # set(FETCHCONTENT_BASE_DIR_SAVE ${FETCHCONTENT_BASE_DIR})
+        # if (PICO_SDK_FETCH_FROM_GIT_PATH)
+        #     get_filename_component(FETCHCONTENT_BASE_DIR "${PICO_SDK_FETCH_FROM_GIT_PATH}" REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
+        # endif ()
+        # # GIT_SUBMODULES_RECURSE was added in 3.17
+        # if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
+        #     FetchContent_Declare(
+        #             pico_sdk
+        #             GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+        #             GIT_TAG master
+        #             GIT_SUBMODULES_RECURSE FALSE
+        #     )
+        # else ()
+        #     FetchContent_Declare(
+        #             pico_sdk
+        #             GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+        #             GIT_TAG master
+        #     )
+        # endif ()
+
+        # if (NOT pico_sdk)
+        #     message("Downloading Raspberry Pi Pico SDK")
+        #     FetchContent_Populate(pico_sdk)
+        #     set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
+        # endif ()
+        # set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})
+
+        # girish END
     else ()
         message(FATAL_ERROR
                 "SDK location was not specified. Please set PICO_SDK_PATH or set PICO_SDK_FETCH_FROM_GIT to on to fetch from git."
